@@ -49,6 +49,14 @@
          type = "int";
       }
    }
+   element jtag_uart_0
+   {
+      datum _sortIndex
+      {
+         value = "6";
+         type = "int";
+      }
+   }
    element nios2_gen2_0
    {
       datum _sortIndex
@@ -84,6 +92,14 @@
       {
          value = "0";
          type = "String";
+      }
+   }
+   element spi_0
+   {
+      datum _sortIndex
+      {
+         value = "5";
+         type = "int";
       }
    }
 }
@@ -154,6 +170,25 @@
   <parameter name="resetSynchronousEdges" value="NONE" />
  </module>
  <module
+   name="jtag_uart_0"
+   kind="altera_avalon_jtag_uart"
+   version="18.1"
+   enabled="1">
+  <parameter name="allowMultipleConnections" value="false" />
+  <parameter name="avalonSpec" value="2.0" />
+  <parameter name="clkFreq" value="50000000" />
+  <parameter name="hubInstanceID" value="0" />
+  <parameter name="readBufferDepth" value="64" />
+  <parameter name="readIRQThreshold" value="8" />
+  <parameter name="simInputCharacterStream" value="" />
+  <parameter name="simInteractiveOptions">NO_INTERACTIVE_WINDOWS</parameter>
+  <parameter name="useRegistersForReadBuffer" value="false" />
+  <parameter name="useRegistersForWriteBuffer" value="false" />
+  <parameter name="useRelativePathForSimFile" value="false" />
+  <parameter name="writeBufferDepth" value="64" />
+  <parameter name="writeIRQThreshold" value="8" />
+ </module>
+ <module
    name="nios2_gen2_0"
    kind="altera_nios2_gen2"
    version="18.1"
@@ -177,7 +212,7 @@
   <parameter name="dataAddrWidth" value="14" />
   <parameter name="dataMasterHighPerformanceAddrWidth" value="1" />
   <parameter name="dataMasterHighPerformanceMapParam" value="" />
-  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x0' end='0x2000' type='altera_avalon_onchip_memory2.s1' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x2800' end='0x3000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='KEY.s1' start='0x3010' end='0x3020' type='altera_avalon_pio.s1' /><slave name='LEDR.s1' start='0x3020' end='0x3030' type='altera_avalon_pio.s1' /></address-map>]]></parameter>
+  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='jtag_uart_0.avalon_jtag_slave' start='0x0' end='0x8' type='altera_avalon_jtag_uart.avalon_jtag_slave' /><slave name='spi_0.spi_control_port' start='0x0' end='0x20' type='altera_avalon_spi.spi_control_port' /><slave name='onchip_memory2_0.s1' start='0x0' end='0x2000' type='altera_avalon_onchip_memory2.s1' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x2800' end='0x3000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='KEY.s1' start='0x3010' end='0x3020' type='altera_avalon_pio.s1' /><slave name='LEDR.s1' start='0x3020' end='0x3030' type='altera_avalon_pio.s1' /></address-map>]]></parameter>
   <parameter name="data_master_high_performance_paddr_base" value="0" />
   <parameter name="data_master_high_performance_paddr_size" value="0" />
   <parameter name="data_master_paddr_base" value="0" />
@@ -367,6 +402,31 @@
   <parameter name="useShallowMemBlocks" value="false" />
   <parameter name="writable" value="true" />
  </module>
+ <module name="spi_0" kind="altera_avalon_spi" version="18.1" enabled="1">
+  <parameter name="avalonSpec" value="2.0" />
+  <parameter name="clockPhase" value="1" />
+  <parameter name="clockPolarity" value="1" />
+  <parameter name="dataWidth" value="8" />
+  <parameter name="disableAvalonFlowControl" value="false" />
+  <parameter name="inputClockRate" value="50000000" />
+  <parameter name="insertDelayBetweenSlaveSelectAndSClk" value="false" />
+  <parameter name="insertSync" value="false" />
+  <parameter name="lsbOrderedFirst" value="false" />
+  <parameter name="masterSPI" value="true" />
+  <parameter name="numberOfSlaves" value="1" />
+  <parameter name="syncRegDepth" value="2" />
+  <parameter name="targetClockRate" value="2000000" />
+  <parameter name="targetSlaveSelectToSClkDelay" value="0.0" />
+ </module>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="nios2_gen2_0.data_master"
+   end="jtag_uart_0.avalon_jtag_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
  <connection
    kind="avalon"
    version="18.1"
@@ -406,6 +466,15 @@
  <connection
    kind="avalon"
    version="18.1"
+   start="nios2_gen2_0.data_master"
+   end="spi_0.spi_control_port">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
    start="nios2_gen2_0.instruction_master"
    end="nios2_gen2_0.debug_mem_slave">
   <parameter name="arbitrationPriority" value="1" />
@@ -424,6 +493,8 @@
  <connection kind="clock" version="18.1" start="clk_0.clk" end="nios2_gen2_0.clk" />
  <connection kind="clock" version="18.1" start="clk_0.clk" end="LEDR.clk" />
  <connection kind="clock" version="18.1" start="clk_0.clk" end="KEY.clk" />
+ <connection kind="clock" version="18.1" start="clk_0.clk" end="spi_0.clk" />
+ <connection kind="clock" version="18.1" start="clk_0.clk" end="jtag_uart_0.clk" />
  <connection
    kind="clock"
    version="18.1"
@@ -443,6 +514,12 @@
    end="nios2_gen2_0.reset" />
  <connection kind="reset" version="18.1" start="clk_0.clk_reset" end="LEDR.reset" />
  <connection kind="reset" version="18.1" start="clk_0.clk_reset" end="KEY.reset" />
+ <connection kind="reset" version="18.1" start="clk_0.clk_reset" end="spi_0.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="clk_0.clk_reset"
+   end="jtag_uart_0.reset" />
  <connection
    kind="reset"
    version="18.1"
